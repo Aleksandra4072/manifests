@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: <ingress-ns>
+  name: <ingress-name>
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/http2-push-preload: "true"
+    nginx.ingress.kubernetes.io/enable-compression: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: <tls-cert>
+      hosts:
+        - <my-domain.com>
+  rules:
+    - host: <my-domain.com>
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: <service-name>
+                port:
+                  number: <service-port>
+
+
+#k get svc -n <ns>    # to get service-name and service-prot
+#k apply -f <ingress-file>
