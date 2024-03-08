@@ -1,0 +1,137 @@
+global:
+  edition: <ce / ee edition>
+  initialRootPassword:
+    secret: <gitlab-password-secret>
+    password: <gitlab-password-secret-key>
+  email:
+    from: <from-email>
+    reply_to: <reply-to-email>
+  smtp:   # enable and configure smtp if you want to be able to receive messages https://docs.gitlab.com/omnibus/settings/smtp.html
+    enabled: true
+    address: <smtp-address> # smtp of an email can be found in email documentation
+    port: <port>
+    user_name: <email-username>
+    domain: <domain>
+    password:
+      secret: "<smtp-secret>"
+      key: <smtp-secret-key>
+    authentication: "plain"
+    starttls_auto: true    # often depends on port number, cannot be the same with tls
+    tls: false       # often depends on port number, cannot be the same with starttls_auto
+  minio:         # disable if configuring external object storage: https://docs.gitlab.com/ee/administration/object_storage.html
+    enabled: false
+  registry:
+    bucket: <registry-storage>
+  appConfig:
+    lfs:
+      bucket: gitlab-lfs-storage
+      connection:
+        secret: connect       # https://gitlab.com/gitlab-org/charts/gitlab/tree/master/examples/objectstorage
+        key: connection
+    artifacts:
+      bucket: <artifacts-storage>
+      connection:
+        secret: connect     # https://gitlab.com/gitlab-org/charts/gitlab/tree/master/examples/objectstorage
+        key: connection
+    uploads:
+      bucket: <uploads-storage>
+      connection:
+        secret: connect       # https://gitlab.com/gitlab-org/charts/gitlab/tree/master/examples/objectstorage
+        key: connection
+    packages:
+      bucket: <packages-storage>
+      connection:
+        secret: connect       # https://gitlab.com/gitlab-org/charts/gitlab/tree/master/examples/objectstorage
+        key: connection
+    backups:
+      bucket: <backup-storage>
+      tmpBucket: <tmp-storage>
+  hosts:
+    https: true
+    domain: <domain>
+    gitlab:
+      name: <my-gitlab-domain.com>
+    registry:
+      name: <my-registry-domain.com>
+      tls:
+        enabled: true
+        secretName: <tls- secret>
+    ssh: gitlab.keiailab.dev
+  ingress:
+    apiVersion: "networking.k8s.io/v1"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/http2-push-preload: "true"
+      nginx.ingress.kubernetes.io/enable-compression: "true"
+    class: nginx
+    configureCertmanager: false
+    tls:
+      secretName: <tls-secret>
+  psql:
+    host: <psql-host>
+    password:
+      secret: <psql-secret>
+      key: <psql-secret-key>
+  redis:
+    host: <redis-host>
+    auth:
+      enabled: false
+
+gitlab:
+  service:   #ssh configuration
+    ssh:
+      enabled: true
+      port: 2222
+  toolbox:
+    backups:
+      objectStorage:
+        config:
+          secret: backups    # https://s3tools.org/kb/item14.htm
+          key: config
+registry:
+  storage:
+    secret: registry      # https://gitlab.com/gitlab-org/charts/gitlab/tree/master/examples/objectstorage
+    key: config
+
+#these services will not be downloaded and used by Gitlab
+prometheus:
+  install: false
+postgresql:
+  install: false
+redis:
+  install: false
+certmanager:
+  install: false
+nginx-ingress:
+  enabled: false
+
+
+
+
+#[INSTALLATION]:
+#  k create secret generic postgresql --from-literal=postgres-password=SU8MS7HYLTU9JHD -n gitlab
+  #  k create secret generic initial-password --from-literal=password=F7rHZCZsqCsCVtkW -n gitlab
+  #  k create secret generic smtp-password --from-literal=password=8DskKd5EmwLz62 -n gitlab
+  #  helm repo add gitlab http://charts.gitlab.io/
+  #  h repo update
+  #  h install gitlab gitlab/gitlab --version 7.9.1 -n gitlab -f gitlab.yaml      #check release versions
+
+#[UPGRADE]:
+  #  h upgrade gitlab gitlab/gitlab --values gitlab.yaml -n gitlab      #check release versions
+  #  k get replicaset -n gitlab
+  #  k delete -n gitlab replicaset ...
+
+#[RETRIEVE PASSWORD]:
+  #  h status gitlab -n gitlab
+  #  kubectl get secret initial-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode ; echo
+
+#[TEST EMAIL]:
+  #  k -n gitlab get pods -lapp=toolbox
+  #  kubectl -n gitlab exec -it gitlab-toolbox-fb5b88cb5-txcsg -- bash
+  # /srv/gitlab/bin/rails console
+  # Notify.test_email('andrei@keiailab.dev', 'Test subject', 'Test body').deliver_now
+
+#[DELETION]:
+  #  helm delete gitlab -n gitlab
+  #  k delete pvc -n gitlab --all
+  #  k delete namespace gitlab

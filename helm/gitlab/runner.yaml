@@ -1,0 +1,26 @@
+gitlabUrl: https://gitlab.keiailab.dev
+rbac:
+  create: true
+runnerToken: "glrt-sTwDfgbU1eztHxEtNsvR"
+runnerRegistrationToken: "GR1348941-voQytPRKW5r7UDPpKzZ"
+runners:
+  privileged: true
+  services:
+    - name: docker:24.0.6-dind
+  config: |
+    [[runners]]
+      [runners.kubernetes]
+        image = "docker:24.0.6"
+        namespace = "{{.Release.Namespace}}"
+        privileged = true
+        [[runners.kubernetes.volumes.host_path]]
+          name = "docker-certs"
+          mount_path = "/certs/client"
+          read_only = true
+          host_path = "/certs/client"
+        [[runners.kubernetes.services]]
+          name = "docker:24.0.6-dind"
+          command = ["--tls=false"]
+
+
+# helm install pbit-runner gitlab/gitlab-runner --version 0.62.1 -f runner.yaml -n gitlab-runner

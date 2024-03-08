@@ -1,0 +1,13 @@
+s3:
+  bucket: gitlab-registry-storage
+  accesskey: lkupldduCGzEWbFA
+  secretkey: m($i@PBhfWIkPF$v
+  region: eu-central-1
+  v4auth: true
+  regionendpoint: "https://minioapi.keiailab.dev"
+  pathstyle: true
+
+
+#   kubectl create secret generic registry \
+#      --from-file=config=minio-registry.yaml \
+#      -n gitlab

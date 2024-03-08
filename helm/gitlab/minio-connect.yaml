@@ -1,0 +1,14 @@
+provider: AWS
+region: eu-central-1
+aws_access_key_id: lkupldduCGzEWbFA
+aws_secret_access_key: m($i@PBhfWIkPF$v
+aws_signature_version: 4
+host: minio.dev.svc.cluster.local
+endpoint: 'https://minioapi.keiailab.dev'
+path_style: true
+
+
+
+#  kubectl create secret generic connect \
+#  --from-file=connection=minio-connect.yaml \
+#  -n gitlab

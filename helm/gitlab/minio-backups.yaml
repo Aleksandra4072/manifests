@@ -1,0 +1,12 @@
+access_key = lkupldduCGzEWbFA
+secret_key = m($i@PBhfWIkPF$v
+bucket_location = eu-central-1
+multipart_chunk_size_mb = 128
+host_base = minioapi.keiailab.dev
+host_bucket = gitlab-backup-storage.minioapi.keiailab.dev
+use_https = True
+website_endpoint = https://gitlab-backup-storage.minioapi.keiailab.dev
+
+# kubectl create secret generic backups \
+#    --from-file=config=minio-backups.yaml \
+#    -n gitlab
